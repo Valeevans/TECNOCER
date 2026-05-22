@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Calidad – Tecnocer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f1;--surf:#fff;--bord:#e2e0db;--bord2:#ccc9c2;--txt:#1a1917;--mut:#6b6860;--hint:#a09d97;--acc:#1a3a5c;--acc-bg:#e8f0f8;--acc-txt:#1a3a5c;--grn:#2d6a4f;--grn-bg:#e8f5ee;--red:#b91c1c;--red-bg:#fef2f2;--warn:#92400e;--warn-bg:#fef3c7;--r:10px;--rs:6px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:15px}
+.header{background:var(--acc);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:#fff;letter-spacing:.05em}
+.app-name{color:#fff;font-size:15px;font-weight:600}
+.app-sub{color:rgba(255,255,255,.6);font-size:11px}
+.sync{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.7)}
+.dot{width:7px;height:7px;border-radius:50%;background:#4ade80}
+.dot.off{background:#f87171}
+.nav{background:var(--surf);border-bottom:1px solid var(--bord);display:flex;padding:0 20px;overflow-x:auto}
+.nb{padding:12px 16px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--mut);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.nb.on{color:var(--acc);border-bottom-color:var(--acc)}
+.content{max-width:960px;margin:0 auto;padding:18px 16px 60px}
+.ttabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tb{padding:6px 16px;font-size:13px;font-weight:500;border:1px solid var(--bord2);border-radius:20px;background:transparent;color:var(--mut);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.tb.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.ct{font-size:14px;font-weight:600;color:var(--txt);margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.f{display:flex;flex-direction:column;gap:4px}
+.f label{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.f input,.f select{font-size:13px;padding:8px 10px;border:1px solid var(--bord2);border-radius:var(--rs);background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;width:100%;transition:border-color .15s}
+.f input:focus,.f select:focus{outline:none;border-color:var(--acc);background:#fff}
+.f input[readonly]{background:var(--acc-bg);color:var(--acc-txt);font-weight:600;border-color:transparent}
+.f input.ok{background:var(--grn-bg);color:var(--grn);font-weight:600;border-color:transparent}
+.f input.err{background:var(--red-bg);color:var(--red);font-weight:600;border-color:transparent}
+.div{height:1px;background:var(--bord);margin:14px 0}
+.slbl{font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.brow{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 16px;font-size:13px;font-weight:500;border-radius:var(--rs);cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--bord2);background:var(--bg);color:var(--mut);transition:all .15s}
+.btn:hover{background:var(--bord)}
+.btnp{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btnp:hover{background:#112840}
+.btnp:disabled{opacity:.6;cursor:not-allowed}
+.smsg{font-size:13px}
+.smsg.ok{color:var(--grn)}
+.smsg.err{color:var(--red)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.sc{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:14px 16px}
+.sl{font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.sv{font-size:26px;font-weight:600;color:var(--txt);line-height:1}
+.ss{font-size:11px;color:var(--hint);margin-top:3px}
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.rfbtn{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:12px;font-weight:500;border:1px solid var(--bord2);border-radius:var(--rs);background:transparent;color:var(--mut);cursor:pointer;font-family:'DM Sans',sans-serif}
+.rfbtn:hover{background:var(--bg)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 10px;font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--bord);background:var(--bg);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--bord);color:var(--txt);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.bok{background:var(--grn-bg);color:var(--grn)}
+.berr{background:var(--red-bg);color:var(--red)}
+.binfo{background:var(--acc-bg);color:var(--acc-txt)}
+.bwarn{background:var(--warn-bg);color:var(--warn)}
+.empty{text-align:center;padding:36px;color:var(--hint);font-size:13px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--bord2);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.mini-stat{background:var(--bg);border-radius:var(--rs);padding:10px 12px;border:1px solid var(--bord)}
+.mini-lbl{font-size:10px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.mini-val{font-size:16px;font-weight:600;color:var(--txt)}
+.mini-sub{font-size:10px;color:var(--hint)}
+.chart-bar{height:8px;background:var(--bord);border-radius:4px;overflow:hidden;margin-top:4px}
+.chart-fill{height:100%;border-radius:4px;transition:width .5s}
+.fill-ok{background:var(--grn)}
+.fill-err{background:var(--red)}
+.fill-acc{background:var(--acc)}
+.tol-info{font-size:10px;color:var(--hint);margin-top:2px}
+@media(max-width:500px){.grid{grid-template-columns:1fr 1fr}.content{padding:12px 12px 60px}.sv{font-size:20px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="logo">TNC</div>
+    <div><div class="app-name">Control de Calidad</div><div class="app-sub">Tecnocer · Planta</div></div>
+  </div>
+  <div class="sync"><span class="dot" id="dot"></span><span id="stxt">Conectando...</span></div>
+</div>
+
+<div class="nav">
+  <button class="nb on" onclick="goSec('carga',this)">Carga</button>
+  <button class="nb" onclick="goSec('tablero',this)">Tablero SGC</button>
+  <button class="nb" onclick="goSec('historial',this)">Historial</button>
+</div>
+
+<div class="content">
+
+<!-- CARGA -->
+<div id="sec-carga">
+  <div class="ttabs">
+    <button class="tb on" onclick="goTipo('espesores',this)">Espesores</button>
+    <button class="tb" onclick="goTipo('dimensiones',this)">Dimensiones</button>
+    <button class="tb" onclick="goTipo('absorcion',this)">Absorción</button>
+  </div>
+
+  <!-- ESPESORES -->
+  <div id="f-espesores">
+    <div class="card">
+      <div class="ct">Registro de espesores · RE PR 02 06</div>
+      <div class="grid">
+        <div class="f"><label>Fecha</label><input type="date" id="e-fecha"></div>
+        <div class="f"><label>Hora</label><input type="time" id="e-hora"></div>
+        <div class="f"><label>Operario</label><input type="text" id="e-op" placeholder="Apellido..."></div>
+        <div class="f"><label>N° Lote</label><input type="number" id="e-lote" min="1" placeholder="Ej: 7"></div>
+        <div class="f"><label>Producto</label>
+          <select id="e-prod"><option value="">Seleccionar...</option><option>8</option><option>12</option><option>18</option><option>24</option></select>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="slbl">Espesor exterior — EE1 a EE4 (mm) · Mín: 9.3</div>
+      <div class="grid2">
+        <div class="f"><label>EE1</label><input type="number" id="e-ee1" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>EE2</label><input type="number" id="e-ee2" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>EE3</label><input type="number" id="e-ee3" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>EE4</label><input type="number" id="e-ee4" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>Prom. Ext.</label><input type="text" id="e-pe" readonly></div>
+        <div class="f"><label>Resultado</label><input type="text" id="e-re" readonly></div>
+      </div>
+      <div class="div"></div>
+      <div class="slbl">Espesor interior — EI5 a EI8 (mm) · Mín: 7.0</div>
+      <div class="grid2">
+        <div class="f"><label>EI5</label><input type="number" id="e-ei5" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>EI6</label><input type="number" id="e-ei6" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>EI7</label><input type="number" id="e-ei7" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>EI8</label><input type="number" id="e-ei8" step="0.1" placeholder="0.0" oninput="calcEsp()"></div>
+        <div class="f"><label>Prom. Int.</label><input type="text" id="e-pi" readonly></div>
+        <div class="f"><label>Resultado</label><input type="text" id="e-ri" readonly></div>
+      </div>
+      <div class="div"></div>
+      <div class="f"><label>Observaciones</label><input type="text" id="e-obs" placeholder="Opcional..."></div>
+      <div class="brow">
+        <span class="smsg" id="e-msg"></span>
+        <button class="btn" onclick="limpiar('e')">Limpiar</button>
+        <button class="btn btnp" id="e-save" onclick="guardar('espesores')">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIMENSIONES -->
+  <div id="f-dimensiones" style="display:none">
+    <div class="card">
+      <div class="ct">Registro de dimensiones · RE PR 02 05</div>
+      <div class="grid">
+        <div class="f"><label>Fecha</label><input type="date" id="d-fecha"></div>
+        <div class="f"><label>Hora</label><input type="time" id="d-hora"></div>
+        <div class="f"><label>Operario</label><input type="text" id="d-op" placeholder="Apellido..."></div>
+        <div class="f"><label>N° Lote</label><input type="number" id="d-lote" min="1" placeholder="Ej: 7"></div>
+        <div class="f"><label>Producto-Tipo</label>
+          <select id="d-prod" onchange="actualizarTols()">
+            <option value="">Seleccionar...</option>
+            <option>8-Verde</option><option>8-Seco</option><option>8-Cocido</option>
+            <option>12-Verde</option><option>12-Seco</option><option>12-Cocido</option>
+            <option>18-Verde</option><option>18-Seco</option><option>18-Cocido</option>
+            <option>24-Verde</option><option>24-Seco</option><option>24-Cocido</option>
+          </select>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div id="tol-info" style="font-size:11px;color:var(--hint);margin-bottom:10px;display:none"></div>
+      <div class="grid2">
+        <div class="f"><label>Peso (kg)</label><input type="number" id="d-peso" step="0.01" placeholder="0.00" oninput="checkDim()"></div>
+        <div class="f"><label>VP</label><input type="text" id="d-vp" readonly></div>
+        <div class="f"><label>Alto (mm)</label><input type="number" id="d-alto" step="0.1" placeholder="0.0" oninput="checkDim()"></div>
+        <div class="f"><label>VA</label><input type="text" id="d-va" readonly></div>
+        <div class="f"><label>Ancho (mm)</label><input type="number" id="d-ancho" step="0.1" placeholder="0.0" oninput="checkDim()"></div>
+        <div class="f"><label>VN</label><input type="text" id="d-vn" readonly></div>
+        <div class="f"><label>Largo (mm)</label><input type="number" id="d-largo" step="0.1" placeholder="0.0" oninput="checkDim()"></div>
+        <div class="f"><label>VL</label><input type="text" id="d-vl" readonly></div>
+      </div>
+      <div class="div"></div>
+      <div class="f"><label>Observaciones</label><input type="text" id="d-obs" placeholder="Opcional..."></div>
+      <div class="brow">
+        <span class="smsg" id="d-msg"></span>
+        <button class="btn" onclick="limpiar('d')">Limpiar</button>
+        <button class="btn btnp" id="d-save" onclick="guardar('dimensiones')">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABSORCION -->
+  <div id="f-absorcion" style="display:none">
+    <div class="card">
+      <div class="ct">Registro de absorción · RE PR 02 12</div>
+      <div class="slbl">Peso seco</div>
+      <div class="grid">
+        <div class="f"><label>Fecha</label><input type="date" id="a-fs"></div>
+        <div class="f"><label>Hora</label><input type="time" id="a-hs"></div>
+        <div class="f"><label>Operario</label><input type="text" id="a-ops" placeholder="Apellido..."></div>
+        <div class="f"><label>N° Lote</label><input type="number" id="a-lote" min="1" placeholder="Ej: 7"></div>
+        <div class="f"><label>Producto</label>
+          <select id="a-prod"><option value="">Seleccionar...</option><option>8</option><option>12</option><option>18</option><option>24</option></select>
+        </div>
+        <div class="f"><label>Peso seco (kg)</label><input type="number" id="a-ps" step="0.01" placeholder="0.00" oninput="calcAbs()"></div>
+      </div>
+      <div class="div"></div>
+      <div class="slbl">Peso húmedo</div>
+      <div class="grid">
+        <div class="f"><label>Fecha</label><input type="date" id="a-fh"></div>
+        <div class="f"><label>Hora</label><input type="time" id="a-hh"></div>
+        <div class="f"><label>Operario</label><input type="text" id="a-oph" placeholder="Apellido..."></div>
+        <div class="f"><label>Peso húmedo (kg)</label><input type="number" id="a-ph" step="0.01" placeholder="0.00" oninput="calcAbs()"></div>
+      </div>
+      <div class="div"></div>
+      <div class="grid">
+        <div class="f"><label>% Absorción</label><input type="text" id="a-abs" readonly></div>
+        <div class="f"><label>Resultado · (15–19%)</label><input type="text" id="a-res" readonly></div>
+        <div class="f"><label>Observaciones</label><input type="text" id="a-obs" placeholder="Opcional..."></div>
+      </div>
+      <div class="brow">
+        <span class="smsg" id="a-msg"></span>
+        <button class="btn" onclick="limpiar('a')">Limpiar</button>
+        <button class="btn btnp" id="a-save" onclick="guardar('absorcion')">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLERO -->
+<div id="sec-tablero" style="display:none">
+  <div class="sec-hdr">
+    <span style="font-size:15px;font-weight:600">Tablero SGC</span>
+    <button class="rfbtn" onclick="cargarTablero()">↻ Actualizar</button>
+  </div>
+  <div class="sgrid">
+    <div class="sc"><div class="sl">Espesores</div><div class="sv" id="s-esp">-</div><div class="ss">registros totales</div></div>
+    <div class="sc"><div class="sl">Dimensiones</div><div class="sv" id="s-dim">-</div><div class="ss">registros totales</div></div>
+    <div class="sc"><div class="sl">Absorción</div><div class="sv" id="s-abs">-</div><div class="ss">registros totales</div></div>
+    <div class="sc"><div class="sl">Último lote</div><div class="sv" id="s-lote">-</div><div class="ss">activo</div></div>
+    <div class="sc"><div class="sl">% Aprobados hoy</div><div class="sv" id="s-apro">-</div><div class="ss">sobre total cargado</div></div>
+  </div>
+
+  <!-- Estadísticas por lote -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div class="ct" style="margin-bottom:0">Estadísticas por lote</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="sel-lote" onchange="cargarEstadisticas()" style="font-size:13px;padding:6px 10px;border:1px solid var(--bord2);border-radius:var(--rs);background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif">
+          <option value="">Seleccionar lote...</option>
+        </select>
+      </div>
+    </div>
+    <div id="est-contenido"><div class="empty">Seleccioná un lote para ver sus estadísticas.</div></div>
+  </div>
+
+  <!-- Últimos registros -->
+  <div class="card">
+    <div class="ct">Últimos registros</div>
+    <div id="t-body"><div class="empty"><span class="spin"></span>Cargando...</div></div>
+  </div>
+</div>
+
+<!-- HISTORIAL -->
+<div id="sec-historial" style="display:none">
+  <div class="sec-hdr">
+    <div class="ttabs" style="margin-bottom:0">
+      <button class="tb on" onclick="goHist('espesores',this)">Espesores</button>
+      <button class="tb" onclick="goHist('dimensiones',this)">Dimensiones</button>
+      <button class="tb" onclick="goHist('absorcion',this)">Absorción</button>
+    </div>
+    <button class="rfbtn" onclick="cargarHist()">↻ Actualizar</button>
+  </div>
+  <div class="card">
+    <div id="h-body"><div class="empty"><span class="spin"></span>Cargando...</div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const URL='https://script.google.com/macros/s/AKfycbzp2TRPqwvZNxy5J79p6N9U4M452_Bim7M4GMgLaJSg5JSxka46XgHoJwlbKQivuooXWg/exec';
+let histTipo='espesores';
+let cacheData={espesores:[],dimensiones:[],absorcion:[]};
+
+const TOLS={
+  '8-Verde':{pMin:4.2,pMax:5,aMin:19.4,aMax:19.8,nMin:8,nMax:8.4,lMin:34,lMax:36},
+  '8-Seco':{pMin:3.3,pMax:4.1,aMin:18.2,aMax:18.6,nMin:7.9,nMax:8.3,lMin:33,lMax:35},
+  '8-Cocido':{pMin:3.2,pMax:4,aMin:17.8,aMax:18.2,nMin:7.8,nMax:8.2,lMin:32,lMax:34},
+  '12-Verde':{pMin:5.4,pMax:6.1,aMin:19.4,aMax:19.8,nMin:12,nMax:12.4,lMin:34,lMax:36},
+  '12-Seco':{pMin:4.4,pMax:5.3,aMin:18.2,aMax:18.6,nMin:11.9,nMax:12.3,lMin:33,lMax:35},
+  '12-Cocido':{pMin:4,pMax:5,aMin:17.8,aMax:18.2,nMin:11.8,nMax:12.2,lMin:32,lMax:34},
+  '18-Verde':{pMin:8,pMax:9.2,aMin:19.4,aMax:19.8,nMin:19.4,nMax:19.8,lMin:34,lMax:36},
+  '18-Seco':{pMin:6.8,pMax:8,aMin:18.2,aMax:18.6,nMin:18.2,nMax:18.6,lMin:33,lMax:35},
+  '18-Cocido':{pMin:6,pMax:7.2,aMin:17.8,aMax:18.2,nMin:17.8,nMax:18.2,lMin:32,lMax:34},
+  '24-Verde':{pMin:9.4,pMax:10.4,aMin:19.4,aMax:19.8,nMin:24.8,nMax:25.2,lMin:34,lMax:36},
+  '24-Seco':{pMin:8,pMax:9,aMin:18.2,aMax:18.6,nMin:24.3,nMax:24.7,lMin:33,lMax:35},
+  '24-Cocido':{pMin:7.7,pMax:8.7,aMin:17.8,aMax:18.2,nMin:23.8,nMax:24.2,lMin:32,lMax:34}
+};
+
+const hoy=()=>new Date().toISOString().split('T')[0];
+const ahorita=()=>new Date().toTimeString().slice(0,5);
+['e-fecha','d-fecha','a-fs','a-fh'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=hoy();});
+['e-hora','d-hora','a-hs','a-hh'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=ahorita();});
+
+fetch(URL).then(()=>{document.getElementById('dot').classList.remove('off');document.getElementById('stxt').textContent='Conectado';}).catch(()=>{document.getElementById('dot').classList.add('off');document.getElementById('stxt').textContent='Sin conexión';});
+
+function prom(arr){const v=arr.filter(x=>x!==null&&!isNaN(x));return v.length?(v.reduce((a,b)=>a+b)/v.length):null;}
+function res(val,min,max){if(val===null||isNaN(val))return null;return(val>=min&&val<=max)?'A':'R';}
+function setRes(elId,r){const el=document.getElementById(elId);if(!el)return;el.value=r||'';el.className='f input '+(r==='A'?'ok':r==='R'?'err':'');}
+
+function calcEsp(){
+  const v=id=>{const x=parseFloat(document.getElementById(id).value);return isNaN(x)?null:x;};
+  const ee=[v('e-ee1'),v('e-ee2'),v('e-ee3'),v('e-ee4')].filter(x=>x!==null);
+  const ei=[v('e-ei5'),v('e-ei6'),v('e-ei7'),v('e-ei8')].filter(x=>x!==null);
+  const pe=ee.length?prom(ee):null;
+  const pi=ei.length?prom(ei):null;
+  const elPe=document.getElementById('e-pe');
+  const elPi=document.getElementById('e-pi');
+  if(elPe)elPe.value=pe!==null?pe.toFixed(2):'';
+  if(elPi)elPi.value=pi!==null?pi.toFixed(2):'';
+  const re=pe!==null?res(pe,9.3,99):'';
+  const ri=pi!==null?res(pi,7.0,99):'';
+  const elRe=document.getElementById('e-re');
+  const elRi=document.getElementById('e-ri');
+  if(elRe){elRe.value=re;elRe.className=re==='A'?'ok':re==='R'?'err':'';}
+  if(elRi){elRi.value=ri;elRi.className=ri==='A'?'ok':ri==='R'?'err':'';}
+}
+
+function actualizarTols(){
+  const prod=document.getElementById('d-prod').value;
+  const t=TOLS[prod];
+  const info=document.getElementById('tol-info');
+  if(t&&info){
+    info.style.display='block';
+    info.innerHTML=`Tolerancias — Peso: ${t.pMin}–${t.pMax}kg · Alto: ${t.aMin}–${t.aMax}mm · Ancho: ${t.nMin}–${t.nMax}mm · Largo: ${t.lMin}–${t.lMax}mm`;
+  } else if(info){info.style.display='none';}
+  checkDim();
+}
+
+function checkDim(){
+  const prod=document.getElementById('d-prod').value;
+  const t=TOLS[prod];
+  const campos=[
+    ['d-peso','d-vp',t?t.pMin:null,t?t.pMax:null],
+    ['d-alto','d-va',t?t.aMin:null,t?t.aMax:null],
+    ['d-ancho','d-vn',t?t.nMin:null,t?t.nMax:null],
+    ['d-largo','d-vl',t?t.lMin:null,t?t.lMax:null]
+  ];
+  campos.forEach(([vid,vres,mn,mx])=>{
+    const val=parseFloat(document.getElementById(vid).value);
+    const el=document.getElementById(vres);
+    if(!el)return;
+    if(!isNaN(val)&&mn!==null){
+      const r=res(val,mn,mx);
+      el.value=r;
+      el.className=r==='A'?'ok':'err';
+    } else {el.value='';el.className='';}
+  });
+}
+
+function calcAbs(){
+  const s=parseFloat(document.getElementById('a-ps').value);
+  const h=parseFloat(document.getElementById('a-ph').value);
+  const elAbs=document.getElementById('a-abs');
+  const elRes=document.getElementById('a-res');
+  if(!isNaN(s)&&!isNaN(h)&&s>0){
+    const abs=((h-s)/s)*100;
+    elAbs.value=abs.toFixed(2)+'%';
+    const r=res(abs,15,19);
+    elRes.value=r;
+    elRes.className=r==='A'?'ok':'err';
+  } else {elAbs.value='';elRes.value='';elRes.className='';}
+}
+
+function goSec(s,btn){
+  ['carga','tablero','historial'].forEach(x=>document.getElementById('sec-'+x).style.display=x===s?'block':'none');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(s==='tablero')cargarTablero();
+  if(s==='historial')cargarHist();
+}
+function goTipo(t,btn){
+  ['espesores','dimensiones','absorcion'].forEach(x=>document.getElementById('f-'+x).style.display=x===t?'block':'none');
+  document.querySelectorAll('#sec-carga .ttabs .tb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function goHist(t,btn){
+  histTipo=t;
+  document.querySelectorAll('#sec-historial .ttabs .tb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  cargarHist();
+}
+
+function val(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function setMsg(p,tipo,txt){
+  const el=document.getElementById(p+'-msg');
+  if(!el)return;
+  el.className='smsg'+(tipo?' '+tipo:'');
+  el.textContent=txt;
+  if(tipo==='ok')setTimeout(()=>{el.className='smsg';el.textContent='';},3000);
+}
+
+async function guardar(tipo){
+  const p=tipo==='espesores'?'e':tipo==='dimensiones'?'d':'a';
+  const req=tipo==='espesores'?[['e-fecha','Fecha'],['e-hora','Hora'],['e-op','Operario'],['e-lote','N° Lote'],['e-prod','Producto']]:
+            tipo==='dimensiones'?[['d-fecha','Fecha'],['d-hora','Hora'],['d-op','Operario'],['d-lote','N° Lote'],['d-prod','Producto-Tipo']]:
+            [['a-fs','Fecha seco'],['a-ops','Operario'],['a-lote','N° Lote'],['a-prod','Producto']];
+  for(const [id,n] of req){if(!val(id)){setMsg(p,'err','Falta: '+n);return;}}
+
+  let fila={};
+  if(tipo==='espesores'){
+    fila={fecha:val('e-fecha'),hora:val('e-hora'),operario:val('e-op'),lote:val('e-lote'),producto:val('e-prod'),
+      ee1:val('e-ee1'),ee2:val('e-ee2'),ee3:val('e-ee3'),ee4:val('e-ee4'),promE:val('e-pe'),resE:val('e-re'),
+      ei5:val('e-ei5'),ei6:val('e-ei6'),ei7:val('e-ei7'),ei8:val('e-ei8'),promI:val('e-pi'),resI:val('e-ri'),
+      obs:val('e-obs')};
+  } else if(tipo==='dimensiones'){
+    fila={fecha:val('d-fecha'),hora:val('d-hora'),operario:val('d-op'),lote:val('d-lote'),producto:val('d-prod'),
+      peso:val('d-peso'),vp:val('d-vp'),alto:val('d-alto'),va:val('d-va'),
+      ancho:val('d-ancho'),vn:val('d-vn'),largo:val('d-largo'),vl:val('d-vl'),obs:val('d-obs')};
+  } else {
+    fila={fecha_seco:val('a-fs'),hora_seco:val('a-hs'),operario_seco:val('a-ops'),
+      fecha_humedo:val('a-fh'),hora_humedo:val('a-hh'),operario_humedo:val('a-oph'),
+      lote:val('a-lote'),producto:val('a-prod'),
+      peso_seco:val('a-ps'),peso_humedo:val('a-ph'),absorcion:val('a-abs'),resultado:val('a-res'),obs:val('a-obs')};
+  }
+
+  const btn=document.getElementById(p+'-save');
+  btn.textContent='Guardando...';btn.disabled=true;
+  setMsg(p,'','');
+  try{
+    const r=await fetch(URL,{method:'POST',body:JSON.stringify({tipo,fila}),headers:{'Content-Type':'text/plain'}});
+    const d=await r.json();
+    if(d.ok){setMsg(p,'ok','✓ Guardado correctamente');limpiar(p);}
+    else setMsg(p,'err','Error: '+d.error);
+  }catch(e){setMsg(p,'err','Error de conexión. Reintentá.');}
+  btn.textContent='Guardar';btn.disabled=false;
+}
+
+function limpiar(p){
+  const campos={
+    e:['e-hora','e-op','e-lote','e-ee1','e-ee2','e-ee3','e-ee4','e-pe','e-re','e-ei5','e-ei6','e-ei7','e-ei8','e-pi','e-ri','e-obs'],
+    d:['d-hora','d-op','d-lote','d-peso','d-vp','d-alto','d-va','d-ancho','d-vn','d-largo','d-vl','d-obs'],
+    a:['a-hs','a-ops','a-lote','a-fh','a-hh','a-oph','a-ps','a-ph','a-abs','a-res','a-obs']
+  };
+  (campos[p]||[]).forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.className='';}});
+  const sels={e:['e-prod'],d:['d-prod'],a:['a-prod']};
+  (sels[p]||[]).forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const fmap={e:'e-fecha',d:'d-fecha',a:'a-fs'};
+  const fel=document.getElementById(fmap[p]);if(fel)fel.value=hoy();
+  const hmap={e:'e-hora',d:'d-hora',a:'a-hs'};
+  const hel=document.getElementById(hmap[p]);if(hel)hel.value=ahorita();
+  if(p==='d'){const ti=document.getElementById('tol-info');if(ti)ti.style.display='none';}
+}
+
+async function cargarTablero(){
+  document.getElementById('t-body').innerHTML='<div class="empty"><span class="spin"></span>Cargando...</div>';
+  try{
+    const [re,rd,ra]=await Promise.all([
+      fetch(URL+'?tipo=espesores').then(r=>r.json()),
+      fetch(URL+'?tipo=dimensiones').then(r=>r.json()),
+      fetch(URL+'?tipo=absorcion').then(r=>r.json())
+    ]);
+    cacheData.espesores=re.rows||[];
+    cacheData.dimensiones=rd.rows||[];
+    cacheData.absorcion=ra.rows||[];
+
+    const esp=cacheData.espesores,dim=cacheData.dimensiones,abs=cacheData.absorcion;
+    document.getElementById('s-esp').textContent=esp.length;
+    document.getElementById('s-dim').textContent=dim.length;
+    document.getElementById('s-abs').textContent=abs.length;
+
+    const todos=[...esp,...dim,...abs];
+    const lotes=[...new Set(todos.map(r=>r.lote).filter(Boolean))];
+    const lotesNum=lotes.map(Number).sort((a,b)=>b-a);
+    document.getElementById('s-lote').textContent=lotesNum.length?lotesNum[0]:'-';
+
+    // % aprobados hoy
+    const h=hoy();
+    const hoyRegs=[...esp,...dim,...abs].filter(r=>r.fecha===h||r.fecha_seco===h);
+    const apros=hoyRegs.filter(r=>r.resE==='A'||r.resI==='A'||r.vp==='A'||r.resultado==='A').length;
+    document.getElementById('s-apro').textContent=hoyRegs.length?(Math.round(apros/hoyRegs.length*100)+'%'):'-';
+
+    // Llenar selector de lotes
+    const sel=document.getElementById('sel-lote');
+    const curVal=sel.value;
+    sel.innerHTML='<option value="">Seleccionar lote...</option>';
+    lotesNum.forEach(l=>sel.innerHTML+=`<option value="${l}">Lote ${l}</option>`);
+    if(curVal)sel.value=curVal;
+
+    // Últimos registros
+    const ultimos=[
+      ...esp.map(r=>({...r,_t:'espesores'})),
+      ...dim.map(r=>({...r,_t:'dimensiones'})),
+      ...abs.map(r=>({...r,_t:'absorcion'}))
+    ].slice(-40).reverse();
+
+    if(!ultimos.length){document.getElementById('t-body').innerHTML='<div class="empty">Sin registros aún.</div>';return;}
+    let html='<div class="tw"><table><thead><tr><th>Fecha</th><th>Lote</th><th>Tipo</th><th>Producto</th><th>Operario</th><th>Resultado</th></tr></thead><tbody>';
+    ultimos.forEach(r=>{
+      const bc=r._t==='espesores'?'binfo':r._t==='dimensiones'?'bwarn':'';
+      const resVal=r._t==='espesores'?(r.resE||r.resI):r._t==='dimensiones'?(r.vp||r.va):r.resultado;
+      const resBadge=resVal==='A'?'bok':resVal==='R'?'berr':'';
+      const fecha=r.fecha||r.fecha_seco||'-';
+      html+=`<tr><td>${fecha}</td><td><strong>Lote ${r.lote||'-'}</strong></td><td><span class="badge ${bc}">${r._t}</span></td><td>${r.producto||'-'}</td><td>${r.operario||r.operario_seco||'-'}</td><td>${resVal?`<span class="badge ${resBadge}">${resVal}</span>`:'-'}</td></tr>`;
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('t-body').innerHTML=html;
+  }catch(e){document.getElementById('t-body').innerHTML='<div class="empty">Error al cargar datos.</div>';}
+}
+
+function cargarEstadisticas(){
+  const lote=parseInt(document.getElementById('sel-lote').value);
+  if(!lote){document.getElementById('est-contenido').innerHTML='<div class="empty">Seleccioná un lote.</div>';return;}
+
+  const esp=cacheData.espesores.filter(r=>parseInt(r.lote)===lote);
+  const dim=cacheData.dimensiones.filter(r=>parseInt(r.lote)===lote);
+  const abs=cacheData.absorcion.filter(r=>parseInt(r.lote)===lote);
+
+  if(!esp.length&&!dim.length&&!abs.length){
+    document.getElementById('est-contenido').innerHTML='<div class="empty">Sin datos para el Lote '+lote+'.</div>';
+    return;
+  }
+
+  let html='';
+
+  // Espesores
+  if(esp.length){
+    const promEs=esp.map(r=>parseFloat(r.promE)).filter(x=>!isNaN(x));
+    const promIs=esp.map(r=>parseFloat(r.promI)).filter(x=>!isNaN(x));
+    const aprobE=esp.filter(r=>r.resE==='A').length;
+    const aprobI=esp.filter(r=>r.resI==='A').length;
+    html+=`<div class="slbl" style="margin-bottom:10px">Espesores · ${esp.length} registros</div>`;
+    html+='<div class="stat-row">';
+    if(promEs.length){
+      const avg=prom(promEs);
+      const pct=Math.round(aprobE/esp.length*100);
+      html+=`<div class="mini-stat"><div class="mini-lbl">Prom. Ext.</div><div class="mini-val">${avg.toFixed(2)} mm</div><div class="chart-bar"><div class="chart-fill ${pct>80?'fill-ok':'fill-err'}" style="width:${pct}%"></div></div><div class="mini-sub">${pct}% aprobados · Mín: 9.3mm</div></div>`;
+    }
+    if(promIs.length){
+      const avg=prom(promIs);
+      const pct=Math.round(aprobI/esp.length*100);
+      html+=`<div class="mini-stat"><div class="mini-lbl">Prom. Int.</div><div class="mini-val">${avg.toFixed(2)} mm</div><div class="chart-bar"><div class="chart-fill ${pct>80?'fill-ok':'fill-err'}" style="width:${pct}%"></div></div><div class="mini-sub">${pct}% aprobados · Mín: 7.0mm</div></div>`;
+    }
+    html+='</div>';
+  }
+
+  // Dimensiones por producto-tipo
+  if(dim.length){
+    html+=`<div class="div"></div><div class="slbl" style="margin-bottom:10px">Dimensiones · ${dim.length} registros</div>`;
+    const porTipo={};
+    dim.forEach(r=>{const k=r.producto||'?';if(!porTipo[k])porTipo[k]=[];porTipo[k].push(r);});
+    html+='<div class="stat-row">';
+    Object.entries(porTipo).forEach(([tipo,regs])=>{
+      const pesos=regs.map(r=>parseFloat(r.peso)).filter(x=>!isNaN(x));
+      const aprobP=regs.filter(r=>r.vp==='A').length;
+      const pct=Math.round(aprobP/regs.length*100);
+      const avgP=pesos.length?prom(pesos):null;
+      html+=`<div class="mini-stat"><div class="mini-lbl">${tipo}</div><div class="mini-val">${avgP!==null?avgP.toFixed(2)+' kg':'-'}</div><div class="chart-bar"><div class="chart-fill ${pct>80?'fill-ok':'fill-err'}" style="width:${pct}%"></div></div><div class="mini-sub">${pct}% aprobados (${regs.length} reg.)</div></div>`;
+    });
+    html+='</div>';
+  }
+
+  // Absorción
+  if(abs.length){
+    const vals=abs.map(r=>parseFloat(r.absorcion)).filter(x=>!isNaN(x));
+    const aprobA=abs.filter(r=>r.resultado==='A').length;
+    if(vals.length){
+      const avg=prom(vals);
+      const mn=Math.min(...vals);
+      const mx=Math.max(...vals);
+      const pct=Math.round(aprobA/abs.length*100);
+      html+=`<div class="div"></div><div class="slbl" style="margin-bottom:10px">Absorción · ${abs.length} registros</div>`;
+      html+='<div class="stat-row">';
+      html+=`<div class="mini-stat"><div class="mini-lbl">Promedio</div><div class="mini-val">${avg.toFixed(2)}%</div><div class="chart-bar"><div class="chart-fill fill-acc" style="width:${Math.min(avg/19*100,100)}%"></div></div><div class="mini-sub">Rango: ${mn.toFixed(1)}% – ${mx.toFixed(1)}% · Tol: 15–19%</div></div>`;
+      html+=`<div class="mini-stat"><div class="mini-lbl">Aprobados</div><div class="mini-val">${aprobA} / ${abs.length}</div><div class="chart-bar"><div class="chart-fill ${pct>80?'fill-ok':'fill-err'}" style="width:${pct}%"></div></div><div class="mini-sub">${pct}% dentro de tolerancia</div></div>`;
+      html+='</div>';
+    }
+  }
+
+  document.getElementById('est-contenido').innerHTML=html||'<div class="empty">Sin datos procesables para este lote.</div>';
+}
+
+async function cargarHist(){
+  document.getElementById('h-body').innerHTML='<div class="empty"><span class="spin"></span>Cargando...</div>';
+  try{
+    const r=await fetch(URL+'?tipo='+histTipo).then(x=>x.json());
+    const rows=(r.rows||[]).reverse();
+    if(!rows.length){document.getElementById('h-body').innerHTML='<div class="empty">Sin registros de '+histTipo+'.</div>';return;}
+    let html='<div class="tw"><table><thead><tr>';
+    if(histTipo==='espesores') html+='<th>Fecha</th><th>Hora</th><th>Lote</th><th>Producto</th><th>Operario</th><th>Prom.Ext</th><th>Res.E</th><th>Prom.Int</th><th>Res.I</th><th>Obs.</th>';
+    if(histTipo==='dimensiones') html+='<th>Fecha</th><th>Hora</th><th>Lote</th><th>Producto</th><th>Operario</th><th>Peso</th><th>VP</th><th>Alto</th><th>VA</th><th>Ancho</th><th>VN</th><th>Largo</th><th>VL</th>';
+    if(histTipo==='absorcion') html+='<th>F.Seco</th><th>Lote</th><th>Producto</th><th>Op.Seco</th><th>P.Seco</th><th>F.Húmedo</th><th>Op.Húmedo</th><th>P.Húmedo</th><th>Absorción</th><th>Resultado</th>';
+    html+='</tr></thead><tbody>';
+    rows.forEach(r=>{
+      const rb=v=>v==='A'?`<span class="badge bok">A</span>`:v==='R'?`<span class="badge berr">R</span>`:'-';
+      if(histTipo==='espesores') html+=`<tr><td>${r.fecha||'-'}</td><td>${r.hora||'-'}</td><td>${r.lote||'-'}</td><td>${r.producto||'-'}</td><td>${r.operario||'-'}</td><td><strong>${r.promE||'-'}</strong></td><td>${rb(r.resE)}</td><td><strong>${r.promI||'-'}</strong></td><td>${rb(r.resI)}</td><td style="color:var(--hint)">${r.obs||'-'}</td></tr>`;
+      if(histTipo==='dimensiones') html+=`<tr><td>${r.fecha||'-'}</td><td>${r.hora||'-'}</td><td>${r.lote||'-'}</td><td>${r.producto||'-'}</td><td>${r.operario||'-'}</td><td>${r.peso||'-'}</td><td>${rb(r.vp)}</td><td>${r.alto||'-'}</td><td>${rb(r.va)}</td><td>${r.ancho||'-'}</td><td>${rb(r.vn)}</td><td>${r.largo||'-'}</td><td>${rb(r.vl)}</td></tr>`;
+      if(histTipo==='absorcion') html+=`<tr><td>${r.fecha_seco||'-'}</td><td>${r.lote||'-'}</td><td>${r.producto||'-'}</td><td>${r.operario_seco||'-'}</td><td>${r.peso_seco||'-'}</td><td>${r.fecha_humedo||'-'}</td><td>${r.operario_humedo||'-'}</td><td>${r.peso_humedo||'-'}</td><td><strong>${r.absorcion||'-'}</strong></td><td>${rb(r.resultado)}</td></tr>`;
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('h-body').innerHTML=html;
+  }catch(e){document.getElementById('h-body').innerHTML='<div class="empty">Error al cargar.</div>';}
+}
+</script>
+</body>
+</html>
